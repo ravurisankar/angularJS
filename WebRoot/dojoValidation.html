@@ -1,0 +1,244 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<link rel="stylesheet" type="text/css" href="../styles.css">
+<link rel="stylesheet" type="text/css" href="css/bootstrap.css">
+
+<style>
+
+/*   @import "../dojoroot/dijit/themes/tundra/tundra.css"; */
+/*         @import "../dojoroot/dojo/resources/dojo.css" */
+body {
+    background-color: #C6F5F2;
+}
+#content { background-color:#C6F5F2; width:950px; min-height:550px; text-align:left; padding:20px;  }
+h1 {
+    padding:20px 10px 20px 10px;
+}
+h2 {
+    padding-left: 0px !important;
+}
+#header {
+    background-color: #CA410B !important;
+}
+.large { font-size:22px; }
+.orange { color:orange; }
+.italic { font-style:italic }
+.textmiddle {vertical-align:middle;}
+.padout { padding-left:25px; padding-right:25px; }
+.rounded-corners {
+     -moz-border-radius: 40px;
+    -webkit-border-radius: 40px;
+    -khtml-border-radius: 40px;
+    border-radius: 40px;
+}
+.rounded-corners-top {
+     -moz-border-top-radius: 40px;
+    -webkit-border-radius: 40px;
+    -khtml-border-radius: 40px;
+    border-radius: 40px;
+}
+.right {
+    float: right;
+}
+.scrolldown { padding-left:20px; color:#EDECE8; font-size:40px; font-weight:bold; vertical-align:middle;
+	text-shadow: #6374AB 2px 2px 2px;
+ }
+ .contentblock { margin: 0px 20px; }
+ .results { border: 1px solid blue; padding:20px; margin-top:20px; min-height:50px; }
+ .blue-bold { font-size:18px; font-weight:bold; color:blue; }
+
+ /* example styles for validation form demo */
+#register-form {
+    background: url("form-fieldset.gif") repeat-x scroll left bottom #F8FDEF;
+    border: 1px solid #DFDCDC;
+    border-radius: 15px 15px 15px 15px;
+    display: inline-block;
+    margin-bottom: 30px;
+    margin-left: 20px;
+    margin-top: 10px;
+    padding: 25px 50px 10px;
+    width: 350px;
+}
+
+#register-form .fieldgroup {
+    background: url("form-divider.gif") repeat-x scroll left top transparent;
+    display: inline-block;
+    padding: 8px 10px;
+    width: 340px;
+}
+
+#register-form .fieldgroup label {
+    float: left;
+    padding: 15px 0 0;
+    text-align: right;
+    width: 110px;
+}
+
+#register-form .fieldgroup input, #register-form .fieldgroup textarea, #register-form .fieldgroup select {
+    float: right;
+    margin: 10px 0;
+    height: 25px;
+}
+
+#register-form .submit {
+    padding: 10px;
+    width: 220px;
+    height: 40px !important;
+}
+
+#register-form .fieldgroup label.error {
+    color: #FB3A3A;
+    display: inline-block;
+    margin: 4px 0 5px 125px;
+    padding: 0;
+    text-align: left;
+    width: 220px;
+}
+</style>
+		<!-- load dojo and provide config via data attribute -->
+		<script src="//ajax.googleapis.com/ajax/libs/dojo/1.6.1/dojo/dojo.xd.js"
+				data-dojo-config="isDebug: true,parseOnLoad: true">
+		</script>
+		<script>
+			dojo.require("dojox.validate.web");
+			dojo.require("dojox.validate.us");
+			dojo.require("dojox.validate.check");
+   			dojo.require("dojox.validate.regexp");
+   			
+			var profile;
+			function doCheck(form){
+			document.getElementById("errorMessage").style.display;
+				var results = dojox.validate.check(form, profile),
+					r = dojo.byId("result");
+
+				if(results.isSuccessful()){
+					r.innerHTML = "Everything passed validation!";
+				} else {
+					
+					var s = "";
+					var missing = results.getMissing();
+					if(missing.length){
+						s += '<h4>The following fields are missing:</h4>'
+							+ '<ol>';
+						dojo.forEach(missing, function(field){
+							s += '<li>' + field + '</li>';
+						});
+						s += '</ol>';
+					}
+
+					var invalid = results.getInvalid();
+					if(invalid.length){
+					var count = 0;
+						
+						dojo.forEach(invalid, function(field){
+							if(field=="email"){
+								s += 'Email is not valid\n';
+								count++;
+							}
+							if(field=="emailConfirm"){
+								if(count>0){
+									if(s!='Email is not valid\n'){
+										s += 'Confirm Email is not valid\n';
+									}
+									
+								}else{
+									s += 'Confirm Email does not match with Email\n';
+								}
+							}
+							if(field=="password2"){
+								s += 'Confirm Password does not match with Password\n';
+							}
+						
+						});
+						if(s!=""){
+							alert(s);
+						}else{
+							alert("Validation is successful");
+						}
+							
+					}
+
+					r.innerHTML = s;
+				}
+			}
+
+			dojo.ready(function(){
+				profile = {
+					trim: [ "firstName", "lastName" ],
+					required: [ "firstName", "lastName", "email", "emailConfirm", "password", "password2" ],
+					constraints: {
+						firstName: 	dojox.validate.isText,
+						lastName:  	dojox.validate.isText,
+						password:  	dojox.validate.isText,
+						password2: 	dojox.validate.isText,
+						email:		[ dojox.validate.isEmailAddress, false, true ],
+						emailConfirm: [ dojox.validate.isEmailAddress, false, true ],
+						phone:		dojox.validate.us.isPhoneNumber
+					},
+					confirm: {
+						"emailConfirm": "email",
+						"password2": "password"
+					}
+				};
+
+				//	set up the form handler.
+				var f = dojo.query("form")[0];
+				f.onsubmit = function(e){
+					dojo.stopEvent(e);
+					doCheck(f);
+				};
+			});
+		</script>
+	</head>
+	<body>
+		<h1> Dojo template Validation</h1>
+		
+		<form id="register-form">
+		 <div id="form-content">
+        <fieldset>
+			<div class="fieldgroup">
+				<label for="firstName">First Name*</label>
+				<input type="text"  name="firstName" id="firstName" required="true" placeholder="First Name" dojoType="dijit.form.ValidationTextBox" missingMessage="Ooops!  You forgot your first name!" />
+			</div>
+			<div class="fieldgroup">
+				<label for="lastName">Last Name*</label>
+				<input type="text" name="lastName" id="lastName" required="true"  placeholder="Last Name" dojoType="dijit.form.ValidationTextBox" missingMessage="Ooops!  You forgot your last name!" />
+			<div>
+			<div class="fieldgroup">
+				<label for="email">Email Address*</label>
+				<input type="text" required="true"  id="email"  name="email" value=""
+							dojoType="dijit.form.ValidationTextBox"
+							 regExp="[a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}" 
+							 promptMessage="Enter email address." 
+							 invalidMessage="Invalid Email Address." />
+			</div>
+			<div class="fieldgroup">
+				<label for="emailConfirm">Confirm Email*</label>
+				<input type="text" required="true"  dojoType="dijit.form.ValidationTextBox" validator="dojox.validate.isEmailAddress" invalidMessage="Invalid Email Address." name="emailConfirm" id="emailConfirm" value="" />
+			</div>
+			<div class="fieldgroup">
+				<label for="password">Password*</label>
+				<input type="password" required="true" name="password" id="password" value="" />
+			</div>
+			<div class="fieldgroup">
+				<label for="password2">Confirm Password*</label>
+				<input type="password" required="true" name="password2" id="password2" value="" />
+			</div>
+			<div class="fieldgroup">
+				<label for="phone">Phone</label>
+				<input type="text" name="phone" id="phone" value="" />
+			</div>
+			<div class="fieldgroup">
+			<input type="submit" value="Validate" />
+				</div>
+			     </fieldset>
+    </div>
+		</form>
+		<div class="fieldgroup">
+				<label id="errorMessage" for="phone" style="display: none;">successful</label>
+			</div>
+		
+	</body>
+</html>
